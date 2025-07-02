@@ -1,0 +1,43 @@
+<% layout("/layouts/boilerplate") -%>
+<form method="POST" action="/listing" novalidate class="needs-validation" enctype="multipart/form-data">
+    <div class="row mb-2 mt-2">
+        <div class="col-8 offset-2">
+        <div class="mb-3">
+            <label for="title" class="form-lebel">Title</label>
+            <input type="text" placeholder="Enter Amazing title" name="listing[title]" class="form-control" required> 
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-lebel">Description</label>
+            <textarea type="text" placeholder="Enter description" name="listing[description]" class="form-control" required></textarea> 
+            <div class="invalid-feedback">Description Should be Short.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="url" class="form-lebel">Upload Image</label>
+            <input type="file" name="listing[image]" class="form-control"> 
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-lebel">Location</label>
+            <input type="text" placeholder="Shimla, Himachal Pradesh" name="listing[location]" class="form-control" required>
+            <div class="invalid-feedback">Location Should be Valid.</div>
+        </div>
+
+        <div class="row">
+            <div class="mb-3 col-md-4">
+                <label for="price" class="form-lebel">Price</label>
+                <input type="text" placeholder="1200" name="listing[price]" class="form-control" required> 
+                <div class="invalid-feedback">Price Should be Valid.</div>
+            </div>
+            <div class="mb-3 col-md-8">
+                <label for="country" class="form-lebel">Country</label>
+                <input type="text" placeholder="India" name="listing[country]" class="form-control" required> 
+                <div class="invalid-feedback">Country Name Should be valid</div>
+            </div>
+        </div>   
+        <button type="submit" class="btn btn-dark">Submit</button> <br>
+    </form>
+    </div>  
+</div>
