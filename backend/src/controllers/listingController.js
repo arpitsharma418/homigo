@@ -2,7 +2,13 @@ const cloudinary = require("../config/cloudinary");
 const Listing = require("../models/Listing");
 
 function validateListing(body) {
-  const requiredFields = ["title", "description", "price", "location", "country"];
+  const requiredFields = [
+    "title",
+    "description",
+    "price",
+    "location",
+    "country",
+  ];
 
   for (const field of requiredFields) {
     if (!body[field]) {
@@ -55,11 +61,25 @@ function buildListingData(body) {
 // Get All Listings
 const getListings = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const totalListings = await Listing.countDocuments();
+
     const listings = await Listing.find({})
       .populate("owner", "username email")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json({ listings });
+    res.json({
+      listings,
+      currentPage: page,
+      totalPages: Math.ceil(totalListings / limit),
+      totalListings,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -126,7 +146,9 @@ const updateListing = async (req, res) => {
     }
 
     if (listing.owner.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "You can update only your own listing." });
+      return res
+        .status(403)
+        .json({ message: "You can update only your own listing." });
     }
 
     const validationError = validateListing(req.body);
@@ -162,7 +184,9 @@ const deleteListing = async (req, res) => {
     }
 
     if (listing.owner.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "You can delete only your own listing." });
+      return res
+        .status(403)
+        .json({ message: "You can delete only your own listing." });
     }
 
     await Listing.findByIdAndDelete(req.params.id);

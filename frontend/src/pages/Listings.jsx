@@ -10,14 +10,22 @@ function Listings() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalListings, setTotalListings] = useState(0);
 
   useEffect(() => {
     api
-      .get("/listings")
-      .then(({ data }) => setListings(data.listings))
+      .get(`/listings?page=${page}&limit=12`)
+      .then(({ data }) => {
+        setListings(data.listings);
+
+        setTotalPages(data.totalPages);
+        setTotalListings(data.totalListings);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [page]);
 
   const filteredListings = useMemo(() => {
     const value = search.trim().toLowerCase();
@@ -27,7 +35,8 @@ function Listings() {
     }
 
     return listings.filter((listing) => {
-      const text = `${listing.title} ${listing.location} ${listing.country}`.toLowerCase();
+      const text =
+        `${listing.title} ${listing.location} ${listing.country}`.toLowerCase();
       return text.includes(value);
     });
   }, [listings, search]);
@@ -36,8 +45,12 @@ function Listings() {
     <section className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase text-rose-600">Stay somewhere good</p>
-          <h1 className="mt-1 text-3xl font-bold text-zinc-950">Find your next Homigo stay</h1>
+          <p className="text-sm font-semibold uppercase text-rose-600">
+            Beyond Bookings
+          </p>
+          <h1 className="mt-1 text-3xl font-bold text-zinc-950">
+            Designed for the way you travel.
+          </h1>
         </div>
         {user && (
           <Link to="/listings/new" className="btn-primary w-full sm:w-auto">
@@ -47,7 +60,10 @@ function Listings() {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="search" className="mb-2 block text-sm font-medium text-zinc-700">
+        <label
+          htmlFor="search"
+          className="mb-2 block text-sm font-medium text-zinc-700"
+        >
           Search by title or place
         </label>
         <input
@@ -60,7 +76,11 @@ function Listings() {
       </div>
 
       {loading && <p className="text-sm text-zinc-600">Loading homes...</p>}
-      {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && (
+        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
       {!loading && !error && filteredListings.length === 0 && (
         <p className="text-sm text-zinc-600">No homes found.</p>
@@ -71,6 +91,44 @@ function Listings() {
           <ListingCard key={listing._id} listing={listing} />
         ))}
       </div>
+
+      {!loading && (
+        <div className="flex gap-4 mt-10 justify-center items-center">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="btn-primary"
+          >
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages || 0 }).map((_, index) => {
+            const pageNumber = index + 1;
+
+            return (
+              <button
+                key={pageNumber}
+                onClick={() => setPage(pageNumber)}
+                className={`px-3 py-1 border rounded-full ${
+                  page === pageNumber
+                    ? "bg-black text-white"
+                    : "bg-white text-black"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="btn-primary"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 }
