@@ -93,7 +93,7 @@ function Listings() {
       </div>
 
       {!loading && (
-        <div className="flex gap-4 mt-10 justify-center items-center">
+        <div className="flex gap-4 mt-10 justify-center items-center flex-wrap">
           <button
             disabled={page === 1}
             onClick={() => setPage(page - 1)}

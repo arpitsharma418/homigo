@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/api";
 import { useAuth } from "../context/AuthContext";
+import { Star, BadgeCheck } from "lucide-react";
 
 function ListingDetails() {
   const { id } = useParams();
@@ -13,6 +14,7 @@ function ListingDetails() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
 
   const isOwner = user && listing?.owner?._id === user._id;
 
@@ -69,16 +71,28 @@ function ListingDetails() {
   }
 
   if (loading) {
-    return <p className="mx-auto max-w-6xl px-4 py-10 text-sm text-zinc-600">Loading home...</p>;
+    return (
+      <p className="mx-auto max-w-6xl px-4 py-10 text-sm text-zinc-600">
+        Loading home...
+      </p>
+    );
   }
 
   if (error && !listing) {
-    return <p className="mx-auto max-w-6xl px-4 py-10 text-sm text-red-700">{error}</p>;
+    return (
+      <p className="mx-auto max-w-6xl px-4 py-10 text-sm text-red-700">
+        {error}
+      </p>
+    );
   }
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
-      {error && <p className="mb-5 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && (
+        <p className="mb-5 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
         <div>
@@ -94,7 +108,9 @@ function ListingDetails() {
             <p className="text-sm font-semibold uppercase text-rose-600">
               {listing.location}, {listing.country}
             </p>
-            <h1 className="mt-2 text-3xl font-bold text-zinc-950">{listing.title}</h1>
+            <h1 className="mt-2 text-3xl font-bold text-zinc-950">
+              {listing.title}
+            </h1>
             <p className="mt-3 text-lg font-semibold text-zinc-900">
               Rs {Number(listing.price).toLocaleString("en-IN")} night
             </p>
@@ -108,10 +124,17 @@ function ListingDetails() {
 
           {isOwner && (
             <div className="flex flex-wrap gap-3">
-              <Link to={`/listings/${listing._id}/edit`} className="btn-secondary">
+              <Link
+                to={`/listings/${listing._id}/edit`}
+                className="btn-secondary"
+              >
                 Edit
               </Link>
-              <button type="button" onClick={handleDeleteListing} className="btn-danger">
+              <button
+                type="button"
+                onClick={handleDeleteListing}
+                className="btn-danger"
+              >
                 Delete
               </button>
             </div>
@@ -125,7 +148,10 @@ function ListingDetails() {
           {user ? (
             <form onSubmit={handleReviewSubmit} className="mt-4 space-y-4">
               <div>
-                <label htmlFor="rating" className="mb-2 block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="rating"
+                  className="mb-2 block text-sm font-medium text-zinc-700"
+                >
                   Rating
                 </label>
                 <select
@@ -142,7 +168,10 @@ function ListingDetails() {
                 </select>
               </div>
               <div>
-                <label htmlFor="comment" className="mb-2 block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="comment"
+                  className="mb-2 block text-sm font-medium text-zinc-700"
+                >
                   Comment
                 </label>
                 <textarea
@@ -169,30 +198,72 @@ function ListingDetails() {
 
         <div>
           <h2 className="text-xl font-bold text-zinc-950">Reviews</h2>
-          <div className="mt-4 space-y-3">
+          <div className="mt-6 space-y-4">
             {listing.reviews?.length ? (
               listing.reviews.map((review) => (
-                <div key={review._id} className="rounded-lg border border-zinc-200 bg-white p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-semibold text-zinc-950">
-                      {review.author?.username || "Homigo user"}
-                    </p>
-                    <p className="text-sm text-zinc-600">{review.rating}/5</p>
+                <div
+                  key={review._id}
+                  className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-1">
+                      <h4 className="text-sm font-semibold text-zinc-900">
+                        {review.author?.username || "Homigo user"}
+                      </h4>
+
+                      <div>
+                        <BadgeCheck className="h-4 w-4 fill-red-500 text-white" />
+                      </div>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1">
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <Star
+                          key={index}
+                          className={`h-4 w-4 ${
+                            index < review.rating
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-zinc-300"
+                          }`}
+                        />
+                      ))}
+
+                      <span className="ml-1 text-xs font-medium text-zinc-700">
+                        {review.rating}.0
+                      </span>
+                    </div>
                   </div>
-                  <p className="mt-2 text-sm text-zinc-700">{review.comment}</p>
-                  {user?._id === review.author?._id && (
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteReview(review._id)}
-                      className="mt-3 text-sm font-semibold text-red-600 hover:text-red-700"
-                    >
-                      Delete review
-                    </button>
-                  )}
+
+                  {/* Review Text */}
+                  <p className="mt-4 text-sm leading-6 text-zinc-700">
+                    {review.comment}
+                  </p>
+
+                  {/* Footer */}
+                  <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3">
+                    <p className="text-xs text-zinc-500">
+                      Thanks for sharing your experience.
+                    </p>
+
+                    {user?._id === review.author?._id && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteReview(review._id)}
+                        className="text-sm font-medium text-red-600 transition hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-zinc-600">No reviews yet.</p>
+              <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-8 text-center">
+                <p className="text-sm text-zinc-600">
+                  No reviews yet. Be the first to share your experience.
+                </p>
+              </div>
             )}
           </div>
         </div>
