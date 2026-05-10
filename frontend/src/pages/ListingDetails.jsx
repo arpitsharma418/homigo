@@ -15,7 +15,6 @@ function ListingDetails() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-
   const isOwner = user && listing?.owner?._id === user._id;
 
   async function loadListing() {
@@ -86,6 +85,15 @@ function ListingDetails() {
     );
   }
 
+  // Avg rating
+  const averageRating =
+    listing.reviews.length > 0
+      ? (
+          listing.reviews.reduce((sum, review) => sum + review.rating, 0) /
+          listing.reviews.length
+        ).toFixed(1)
+      : 0;
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
       {error && (
@@ -99,7 +107,7 @@ function ListingDetails() {
           <img
             src={listing.image?.url}
             alt={listing.title}
-            className="h-[320px] w-full rounded-lg object-cover sm:h-[480px]"
+            className="h-[320px] w-full rounded-xl object-cover sm:h-[480px]"
           />
         </div>
 
@@ -112,7 +120,7 @@ function ListingDetails() {
               {listing.title}
             </h1>
             <p className="mt-3 text-lg font-semibold text-zinc-900">
-              Rs {Number(listing.price).toLocaleString("en-IN")} night
+              Rs {Number(listing.price).toLocaleString("en-IN")} / night
             </p>
           </div>
 
@@ -120,6 +128,15 @@ function ListingDetails() {
 
           <div className="border-t border-zinc-200 pt-4 text-sm text-zinc-600">
             Hosted by {listing.owner?.username || "Homigo user"}
+          </div>
+
+          <div>
+            <button
+              disabled
+              className="w-full p-2 font-semibold bg-red-500 text-white rounded-full hover:bg-red-600 transition disabled:cursor-not-allowed hover:opacity-40"
+            >
+              Reserve <span className="text-xs ">(Comming Soon)</span>
+            </button>
           </div>
 
           {isOwner && (
@@ -154,18 +171,25 @@ function ListingDetails() {
                 >
                   Rating
                 </label>
-                <select
-                  id="rating"
-                  value={rating}
-                  onChange={(event) => setRating(event.target.value)}
-                  className="form-input"
-                >
-                  <option value="5">5 - Loved it</option>
-                  <option value="4">4 - Good</option>
-                  <option value="3">3 - Okay</option>
-                  <option value="2">2 - Poor</option>
-                  <option value="1">1 - Bad</option>
-                </select>
+                {Array.from({ length: 5 }, (_, index) => {
+                  const starValue = index + 1;
+
+                  return (
+                    <button
+                      type="button"
+                      key={starValue}
+                      onClick={() => setRating(starValue)}
+                    >
+                      <Star
+                        className={`h-7 w-7 transition ${
+                          starValue <= rating
+                            ? "fill-yellow-400 text-yellow-400 mr-1"
+                            : "text-zinc-300 mr-1"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
               </div>
               <div>
                 <label
@@ -198,59 +222,72 @@ function ListingDetails() {
 
         <div>
           <h2 className="text-xl font-bold text-zinc-950">Reviews</h2>
-          <div className="mt-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <Star className="text-yellow-500 h-3 w-3 fill-yellow-500" />
+            {listing.reviews.length > 0
+              ? `${averageRating} (${listing.reviews.length} reviews)`
+              : `${listing.reviews.length} reviews`}
+          </div>
+
+          <div className="mt-5 space-y-5">
             {listing.reviews?.length ? (
               listing.reviews.map((review) => (
                 <div
                   key={review._id}
-                  className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+                  className="border border-black/10 p-5 rounded-2xl hover:shadow transition"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-1">
-                      <h4 className="text-sm font-semibold text-zinc-900">
-                        {review.author?.username || "Homigo user"}
-                      </h4>
-
-                      <div>
-                        <BadgeCheck className="h-4 w-4 fill-red-500 text-white" />
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-200 text-lg font-semibold text-zinc-700">
+                      {review.author?.username?.charAt(0).toUpperCase()}
                     </div>
 
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-1">
+                    <div>
+                      <div className="flex items-center gap-1">
+                        <h4 className=" font-semibold text-zinc-950">
+                          {review.author?.username || "Homigo user"}
+                        </h4>
+
+                        <BadgeCheck className="h-4 w-4 fill-red-500 text-white" />
+                      </div>
+
+                      <p className="text-xs text-zinc-500">Homigo guest</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 flex items-center gap-2 text-xs text-zinc-700">
+                    <div className="flex items-center gap-[2px]">
                       {Array.from({ length: 5 }, (_, index) => (
                         <Star
                           key={index}
                           className={`h-4 w-4 ${
                             index < review.rating
-                              ? "fill-yellow-400 text-yellow-400"
+                              ? "fill-yellow-500 text-yellow-500"
                               : "text-zinc-300"
                           }`}
                         />
                       ))}
-
-                      <span className="ml-1 text-xs font-medium text-zinc-700">
-                        {review.rating}.0
-                      </span>
                     </div>
+
+                    <span className="h-1 w-1 bg-black/50 rounded-full"></span>
+
+                    <span>
+                      {new Date(review.createdAt).toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
                   </div>
 
-                  {/* Review Text */}
-                  <p className="mt-4 text-sm leading-6 text-zinc-700">
+                  <p className="mt-3 max-w-3xl text-[14px] text-zinc-800">
                     {review.comment}
                   </p>
 
-                  {/* Footer */}
-                  <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3">
-                    <p className="text-xs text-zinc-500">
-                      Thanks for sharing your experience.
-                    </p>
-
+                  <div className="mt-2">
                     {user?._id === review.author?._id && (
                       <button
                         type="button"
                         onClick={() => handleDeleteReview(review._id)}
-                        className="text-sm font-medium text-red-600 transition hover:text-red-700"
+                        className="text-sm font-medium text-red-600 hover:text-red-700"
                       >
                         Delete
                       </button>
@@ -259,7 +296,7 @@ function ListingDetails() {
                 </div>
               ))
             ) : (
-              <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-8 text-center">
+              <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-10 text-center">
                 <p className="text-sm text-zinc-600">
                   No reviews yet. Be the first to share your experience.
                 </p>
