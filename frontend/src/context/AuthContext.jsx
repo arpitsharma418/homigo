@@ -3,9 +3,21 @@ import { api } from "../api/api";
 
 const AuthContext = createContext(null);
 
+function normalizeUser(user) {
+  if (!user) {
+    return null;
+  }
+
+  return {
+    ...user,
+    _id: user._id || user.id,
+    id: user.id || user._id,
+  };
+}
+
 function readStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem("homigoUser"));
+    return normalizeUser(JSON.parse(localStorage.getItem("homigoUser")));
   } catch (error) {
     return null;
   }
@@ -19,8 +31,9 @@ function AuthProvider({ children }) {
     api
       .get("/auth/me")
       .then(({ data }) => {
-        setUser(data.user);
-        localStorage.setItem("homigoUser", JSON.stringify(data.user));
+        const normalizedUser = normalizeUser(data.user);
+        setUser(normalizedUser);
+        localStorage.setItem("homigoUser", JSON.stringify(normalizedUser));
       })
       .catch(() => {
         setUser(null);
@@ -30,8 +43,9 @@ function AuthProvider({ children }) {
   }, []);
 
   function saveSession(data) {
-    setUser(data.user);
-    localStorage.setItem("homigoUser", JSON.stringify(data.user));
+    const normalizedUser = normalizeUser(data.user);
+    setUser(normalizedUser);
+    localStorage.setItem("homigoUser", JSON.stringify(normalizedUser));
   }
 
   async function signup(formData) {
@@ -55,8 +69,21 @@ function AuthProvider({ children }) {
     localStorage.removeItem("homigoUser");
   }
 
+  async function updateProfile(formData) {
+    const { data } = await api.put("/auth/profile", formData);
+    saveSession(data);
+  }
+
   const value = useMemo(
-    () => ({ user, loading, signup, login, logout, isLoggedIn: Boolean(user) }),
+    () => ({
+      user,
+      loading,
+      signup,
+      login,
+      logout,
+      updateProfile,
+      isLoggedIn: Boolean(user),
+    }),
     [user, loading]
   );
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/api";
 import { useAuth } from "../context/AuthContext";
-import { Star, BadgeCheck } from "lucide-react";
+import { Star, BadgeCheck, UserRound } from "lucide-react";
 
 function ListingDetails() {
   const { id } = useParams();
@@ -126,8 +126,30 @@ function ListingDetails() {
 
           <p className="text-zinc-700">{listing.description}</p>
 
-          <div className="border-t border-zinc-200 pt-4 text-sm text-zinc-600">
-            Hosted by {listing.owner?.username || "Homigo user"}
+          <div className=" p-2 flex leading-4 items-center gap-2 border-b border-t">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-100 text-lg text-white font-semibold">
+              {listing.owner?.avatar?.url ? (
+                <img
+                  src={listing.owner.avatar.url}
+                  alt={`${listing.owner?.username || "Host"} profile`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <UserRound className="h-5 w-5 text-zinc-500" />
+              )}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold">
+                Hosted by {listing.owner?.fullName || listing.owner?.username}
+              </span>
+              <span className="text-xs text-black/60 font-semibold">
+                Listed on{" "}
+                {new Date(listing.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
           </div>
 
           <div>
@@ -238,13 +260,21 @@ function ListingDetails() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-200 text-lg font-semibold text-zinc-700">
-                      {review.author?.username?.charAt(0).toUpperCase()}
+                      {review.author?.avatar?.url ? (
+                        <img
+                          src={review.author.avatar.url}
+                          alt={`${review.author?.username || "Homigo user"} profile`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <UserRound className="h-5 w-5 text-zinc-500" />
+                      )}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-1">
                         <h4 className=" font-semibold text-zinc-950">
-                          {review.author?.username || "Homigo user"}
+                          {review.author?.fullName || review.author?.username || "Homigo user"}
                         </h4>
 
                         <BadgeCheck className="h-4 w-4 fill-red-500 text-white" />

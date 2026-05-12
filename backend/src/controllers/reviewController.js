@@ -28,7 +28,10 @@ const createReview = async (req, res) => {
     listing.reviews.push(review._id);
     await listing.save();
 
-    const populatedReview = await Review.findById(review._id).populate("author", "username email");
+    const populatedReview = await Review.findById(review._id).populate(
+      "author",
+      "username fullName email avatar"
+    );
     res.status(201).json({ review: populatedReview });
   } catch (error) {
     res.status(500).json({ message: error.message });

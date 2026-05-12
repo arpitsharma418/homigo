@@ -5,7 +5,15 @@ import { useAuth } from "../context/AuthContext";
 function Signup() {
   const navigate = useNavigate();
   const { signup } = useAuth();
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    username: "",
+    fullName: "",
+    email: "",
+    password: "",
+    phone: "",
+    location: "",
+    bio: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +59,20 @@ function Signup() {
           />
         </div>
         <div>
+          <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-zinc-700">
+            Full name
+          </label>
+          <input
+            id="fullName"
+            name="fullName"
+            value={form.fullName}
+            onChange={handleChange}
+            className="form-input"
+            maxLength="60"
+            placeholder="This can match another user's name"
+          />
+        </div>
+        <div>
           <label htmlFor="email" className="mb-2 block text-sm font-medium text-zinc-700">
             Email
           </label>
@@ -62,6 +84,47 @@ function Signup() {
             onChange={handleChange}
             className="form-input"
             required
+          />
+        </div>
+        <div>
+          <label htmlFor="phone" className="mb-2 block text-sm font-medium text-zinc-700">
+            Phone
+          </label>
+          <input
+            id="phone"
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            className="form-input"
+            maxLength="20"
+          />
+        </div>
+        <div>
+          <label htmlFor="location" className="mb-2 block text-sm font-medium text-zinc-700">
+            Location
+          </label>
+          <input
+            id="location"
+            name="location"
+            value={form.location}
+            onChange={handleChange}
+            className="form-input"
+            maxLength="80"
+          />
+        </div>
+        <div>
+          <label htmlFor="bio" className="mb-2 block text-sm font-medium text-zinc-700">
+            Bio
+          </label>
+          <textarea
+            id="bio"
+            name="bio"
+            rows="4"
+            value={form.bio}
+            onChange={handleChange}
+            className="form-input"
+            maxLength="300"
+            placeholder="Tell guests or hosts a little about yourself."
           />
         </div>
         <div>

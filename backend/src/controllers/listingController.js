@@ -69,7 +69,7 @@ const getListings = async (req, res) => {
     const totalListings = await Listing.countDocuments();
 
     const listings = await Listing.find({})
-      .populate("owner", "username email")
+      .populate("owner", "username fullName email avatar")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -89,11 +89,11 @@ const getListings = async (req, res) => {
 const getListing = async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id)
-      .populate("owner", "username email")
+      .populate("owner", "username fullName email avatar")
       .populate({
         path: "reviews",
         options: { sort: { createdAt: -1 } },
-        populate: { path: "author", select: "username email" },
+        populate: { path: "author", select: "username fullName email avatar" },
       });
 
     if (!listing) {
@@ -105,6 +105,18 @@ const getListing = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const getListingsByOwner = async (req, res) => {
+  try {
+    const listings = await Listing.find({ owner: req.params.id })
+      .populate("owner", "username fullName email avatar")
+      .sort({ createdAt: -1 });
+
+    res.json({ listings });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 // Create a listing
 const createListing = async (req, res) => {
@@ -202,4 +214,5 @@ module.exports = {
   createListing,
   updateListing,
   deleteListing,
+  getListingsByOwner,
 };

@@ -8,6 +8,8 @@ import ListingForm from "./pages/ListingForm";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile.jsx";
+import EditProfile from "./pages/EditProfile.jsx";
 
 function App() {
   return (
@@ -35,6 +37,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile/>
+            </ProtectedRoute>
+          }/>
+          <Route path="/profile/edit" element={
+            <ProtectedRoute>
+              <EditProfile/>
+            </ProtectedRoute>
+          }/>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

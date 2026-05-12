@@ -8,6 +8,7 @@ const {
   createListing,
   updateListing,
   deleteListing,
+  getListingsByOwner,
 } = require("../controllers/listingController.js");
 const {
   createReview,
@@ -17,6 +18,7 @@ const {
 // Listing routes
 router.get("/", getListings);
 router.get("/:id", getListing);
+router.get("/owner/:id", protect, getListingsByOwner);
 router.post("/", protect, upload.single("image"), createListing);
 router.put("/:id", protect, upload.single("image"), updateListing);
 router.delete("/:id", protect, deleteListing);
