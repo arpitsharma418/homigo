@@ -18,7 +18,6 @@ function Navbar() {
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
         <Link to="/" className="text-xl font-bold text-rose-600 flex items-center gap-2">
-          <img src="/public/Gemini_Generated_Image_.png" alt="" className="h-10 w-10 rounded-lg" />
           Homigo
         </Link>
 
